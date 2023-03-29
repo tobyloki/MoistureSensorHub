@@ -5,6 +5,7 @@
 ```bash
 cd addDevice
 chmod +x addDevice.sh
+chmod +x getDeviceType.sh
 python3 addDevice.py
 ```
 

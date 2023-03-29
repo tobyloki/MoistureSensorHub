@@ -44,6 +44,17 @@ def removeDevice(deviceId):
             os.remove(f"temp-{deviceId}.txt")
         except:
             pass
+
+        # delete row in nodeIds.csv that contains deviceId
+        with open("../nodeIds.csv", "r") as f:
+            fileLines = f.readlines()
+
+        with open("../nodeIds.csv", "w") as f:
+            for line in fileLines:
+                # deviceId is first column
+                if line.strip().split(",")[0] != deviceId:
+                    f.write(line)
+
     except subprocess.TimeoutExpired as e:
         # delete temp.txt
         try:
@@ -75,7 +86,7 @@ def removeDevice(deviceId):
 
 
 if __name__ == '__main__':
-    deviceId = "13"
+    deviceId = "4"
 
     success = removeDevice(deviceId)
     if success is not None and success == True:

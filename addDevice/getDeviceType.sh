@@ -2,7 +2,6 @@
 
 # get args
 deviceId=$1
-code=$2
 
 # set filename to temp- + deviceId + .txt
 filename="temp-$deviceId.txt"
@@ -11,7 +10,7 @@ filename="temp-$deviceId.txt"
 start=$(date +%s%N)
 
 # print hello
-echo "$deviceId - addDevice bash script started"
+echo "$deviceId - checkDeviceType bash script started"
 
 # get current time
 now=$(date +"%T")
@@ -22,7 +21,7 @@ if [ -f "$filename" ]; then
 fi
 
 # get temperature
-~/matter/MoistureSensorFirmware/esp-matter/connectedhomeip/connectedhomeip/out/host/chip-tool pairing code $deviceId $code --commissioner-name 5 > $filename
+~/matter/MoistureSensorFirmware/esp-matter/connectedhomeip/connectedhomeip/out/host/chip-tool temperaturemeasurement read measured-value $deviceId 1 --commissioner-name 5 > $filename
 
 # get elapsed time since start
 elapsedTime=$((($(date +%s%N) - $start)/1000000))

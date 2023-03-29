@@ -79,13 +79,68 @@ def addDevice(deviceId, code):
     return success
 
 
+def getDeviceType(deviceId):
+    script = "./getDeviceType.sh"
+
+    process = subprocess.Popen(
+        [script, deviceId], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    deviceType = "sensor"
+
+    try:
+        # wait for the process to complete
+        output, error = process.communicate()
+
+        # print the output, splitting it by \n
+        lines = output.decode("utf-8").split('\n')
+        for line in lines:
+            print(line)
+
+        # read temp-{deviceId}.txt
+        with open(f"temp-{deviceId}.txt", "r") as f:
+            fileLines = f.readlines()
+
+            # check if any lines contain "error" regardless of case
+            for line in fileLines:
+                if "error" in line.lower():
+                    # delete temp.txt
+                    try:
+                        os.remove(f"temp-{deviceId}.txt")
+                    except:
+                        pass
+
+                    print(f"Error: {line}")
+                    return None
+
+                if "UNSUPPORTED_CLUSTER:" in line:
+                    deviceType = "actuator"
+                    break
+
+        # delete temp.txt
+        try:
+            os.remove(f"temp-{deviceId}.txt")
+        except:
+            pass
+    except Exception as e:
+        # delete temp.txt
+        try:
+            os.remove(f"temp-{deviceId}.txt")
+        except:
+            pass
+
+        print(f"Error: {e}")
+        return None
+
+    return deviceType
+
+
 if __name__ == '__main__':
-    code = "34123219414"
+    code = "31337008017"
 
     print(f"Pairing code: {code}")
 
     # read nodeIds.csv
-    with open("nodeIds.csv", "r") as f:
+    with open("../nodeIds.csv", "r") as f:
         fileLines = f.readlines()
 
         # remove all empty lines
@@ -110,8 +165,13 @@ if __name__ == '__main__':
 
         success = addDevice(deviceId, code)
         if success is not None and success == True:
-            print(f"Device added successfully: {deviceId}")
+            # get device type
+            print(f"Getting device type for {deviceId}")
+            deviceType = getDeviceType(deviceId)
 
-            # write nodeId to file on the next line
-            with open("nodeIds.csv", "a") as f:
-                f.write(f"{deviceId}\n")
+            if deviceType is not None:
+                print(f"Device added successfully: {deviceId}, {deviceType}")
+
+                # write nodeId to file on the next line
+                with open("../nodeIds.csv", "a") as f:
+                    f.write(f"{deviceId},{deviceType}\n")
