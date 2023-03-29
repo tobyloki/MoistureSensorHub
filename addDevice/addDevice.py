@@ -112,7 +112,7 @@ def getDeviceType(deviceId):
                     print(f"Error: {line}")
                     return None
 
-                if "UNSUPPORTED_CLUSTER:" in line:
+                if "UNSUPPORTED_CLUSTER" in line.upper():
                     deviceType = "actuator"
                     break
 
