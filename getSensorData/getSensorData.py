@@ -5,10 +5,12 @@ import time
 
 
 class SensorData:
-    def __init__(self, temperature, pressure, moisture):
+    def __init__(self, temperature, humidity, pressure, soilMoisture, light):
         self.temperature = temperature
+        self.humidity = humidity
         self.pressure = pressure
-        self.moisture = moisture
+        self.soilMoisture = soilMoisture
+        self.light = light
 
 
 def getSensorData(deviceId):
@@ -28,7 +30,7 @@ def getSensorData(deviceId):
         # TODO: handle error
 
         # initialize empty SensorData object
-        data = SensorData(None, None, None)
+        data = SensorData(None, None, None, None, None)
 
         # print the output, splitting it by \n
         lines = output.decode("utf-8").split('\n')
@@ -38,12 +40,14 @@ def getSensorData(deviceId):
             # parse temperature with line containing "temperature: " and get value after space. store value in SensorData
             if "temperature: " in line:
                 data.temperature = int(line.split("temperature: ")[1])
-            # parse pressure with line containing "pressure: " and get value after space. store value in SensorData
+            if "humidity: " in line:
+                data.moisture = int(line.split("humidity: ")[1])
             if "pressure: " in line:
                 data.pressure = int(line.split("pressure: ")[1])
-            # parse moisture with line containing "moisture: " and get value after space. store value in SensorData
-            if "moisture: " in line:
-                data.moisture = int(line.split("moisture: ")[1])
+            if "soilMoisture: " in line:
+                data.soilMoisture = int(line.split("soilMoisture: ")[1])
+            if "light: " in line:
+                data.pressure = int(line.split("light: ")[1])
     except subprocess.TimeoutExpired as e:
         # delete temp.txt
         try:
@@ -82,8 +86,10 @@ def getSensorDataTask(deviceId):
 
         if data is not None:
             print(f"Temperature: {data.temperature}")
+            print(f"Humidity: {data.humidity}")
             print(f"Pressure: {data.pressure}")
-            print(f"Moisture: {data.moisture}")
+            print(f"SoilMoisture: {data.soilMoisture}")
+            print(f"Light: {data.light}")
 
         # NOTE: this sleep only occurs after getSensorData completes
         print("Waiting 5 seconds...")
